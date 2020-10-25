@@ -1,5 +1,18 @@
 <template>
   <div class="accountSummary">
+    <v-card elevation="2">
+      <v-card-title>Account: {{ accountNumber }}</v-card-title>
+      <div class="cardBody">
+        <v-card-subtitle class="cardText balance">
+          Starting Balance:
+          <b>{{ formatPrice(startingBalance) }}</b>
+        </v-card-subtitle>
+        <v-card-subtitle class="cardText balance">
+          Ending Balance:
+          <b>{{ formatPrice(endingBalance) }}</b>
+        </v-card-subtitle>
+      </div>
+    </v-card>
     <v-data-table
       :headers="transactionHeaders"
       :items="transactions"
@@ -70,6 +83,25 @@ export default {
       ]
     };
   },
+  computed: {
+    accountNumber() {
+      return this.$store.getters.allTransactions[0].AccountNumber;
+    },
+    transactions() {
+      return this.$store.getters.allTransactions;
+    },
+    startingBalance() {
+      return this.$store.getters.allTransactions[0].AvailableBalance;
+    },
+    endingBalance() {
+      const allTransactions = this.$store.getters.allTransactions;
+      let endingBalance = allTransactions[0].AvailableBalance;
+      allTransactions.forEach(transaction => {
+        endingBalance -= transaction.Amount;
+      });
+      return endingBalance;
+    }
+  },
   methods: {
     formatPrice(value) {
       return value.toLocaleString("en-US", {
@@ -89,6 +121,10 @@ export default {
 .cardText {
   padding-top: 0px;
   padding-bottom: 0px;
+}
+.balance {
+  color: black;
+  font-size: 18px;
 }
 #detailsTitle {
   font-size: 18px;
